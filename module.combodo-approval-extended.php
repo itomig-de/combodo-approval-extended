@@ -17,7 +17,7 @@
 
 SetupWebPage::AddModule(
 	__FILE__, // Path to the current file, all other file names are relative to the directory containing this file
-	'combodo-approval-extended/1.5.3',
+	'combodo-approval-extended/1.5.4',
 	[
 		// Identification
 		//
