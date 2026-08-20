@@ -102,6 +102,6 @@ Dict::Add('FR FR', 'French', 'Français', [
 	'Class:UserRequest/Stimulus:ev_wait_for_approval+' => '',
 	'Menu:ApprovalRule' => 'Règles d\'approbation',
 	'Menu:ApprovalRule+' => 'Toutes les règles d\'approbation',
-	'Menu:Ongoing approval' => 'Requêtes en attente d\'approbation',
-	'Menu:Ongoing approval+' => 'Requêtes en attente d\'approbation',
+	'Menu:Ongoing approval' => 'Demandes en attente d\'approbation',
+	'Menu:Ongoing approval+' => 'Toutes les demandes en attente d\'approbation, pas seulement les vôtres',
 ]);
