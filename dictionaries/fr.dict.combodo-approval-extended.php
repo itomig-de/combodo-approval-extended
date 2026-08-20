@@ -71,7 +71,7 @@ Dict::Add('FR FR', 'French', 'Français', [
 	'Class:ApprovalRule/Attribute:level2_exit_condition/Value:first_reject' => 'à la première réponse négative',
 	'Class:ApprovalRule/Attribute:level2_exit_condition/Value:first_reject+' => 'Tous les gens interrogés doivent approuver',
 	'Class:ApprovalRule/Attribute:level2_exit_condition/Value:first_reply' => 'à la première réponse',
-	'Class:ApprovalRule/Attribute:level2_exit_condition/Value:first_reply+' => 'La première réponse détermine le résultat du niveau 1',
+	'Class:ApprovalRule/Attribute:level2_exit_condition/Value:first_reply+' => 'La première réponse détermine le résultat du niveau 2',
 	'Class:ApprovalRule/Attribute:level2_rule' => 'Approbateurs N2',
 	'Class:ApprovalRule/Attribute:level2_rule+' => 'OQL pour filtrer les approbateurs à utiliser pour le Ticket, avec des placeholders comme `:this->caller_id`',
 	'Class:ApprovalRule/Attribute:level2_substitute_query' => 'Suppléants N2',
