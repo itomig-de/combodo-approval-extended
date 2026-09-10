@@ -137,6 +137,16 @@
           <default_value>no</default_value>
           <is_null_allowed>false</is_null_allowed>
         </field>
+        <field id="level1_single_answer_per_person" xsi:type="AttributeEnum">
+          <values>
+            <value id="yes"><code>yes</code></value>
+            <value id="no"><code>no</code></value>
+          </values>
+          <display_style>radio_horizontal</display_style>
+          <sql>level1_single_answer_per_person</sql>
+          <default_value>no</default_value>
+          <is_null_allowed>false</is_null_allowed>
+        </field>
         <field id="level1_timeout" xsi:type="AttributeInteger">
           <sql>level1_timeout</sql>
           <default_value>70</default_value>
@@ -174,6 +184,16 @@
           </values>
           <display_style>radio_horizontal</display_style>
           <sql>level2_default_approval</sql>
+          <default_value>no</default_value>
+          <is_null_allowed>true</is_null_allowed>
+        </field>
+        <field id="level2_single_answer_per_person" xsi:type="AttributeEnum">
+          <values>
+            <value id="yes"><code>yes</code></value>
+            <value id="no"><code>no</code></value>
+          </values>
+          <display_style>radio_horizontal</display_style>
+          <sql>level2_single_answer_per_person</sql>
           <default_value>no</default_value>
           <is_null_allowed>true</is_null_allowed>
         </field>
@@ -274,6 +294,9 @@
                     <item id="level1_substitute_timeout">
                       <rank>60</rank>
                     </item>
+                    <item id="level1_single_answer_per_person">
+                      <rank>70</rank>
+                    </item>
                   </items>
                 </item>
               </items>
@@ -301,6 +324,9 @@
                     </item>
                     <item id="level2_substitute_timeout">
                       <rank>60</rank>
+                    </item>
+                    <item id="level2_single_answer_per_person">
+                      <rank>70</rank>
                     </item>
                   </items>
                 </item>
@@ -433,6 +459,7 @@
 		))
 		{
 			$bStepAdded = true;
+			$oScheme->SetStepFlag(count($oScheme->GetSteps()) - 1, 'single_answer_per_person', $aStep1Data['single_answer_per_person']);
 		}
 
     $aStep2Data = static::GetStepDataFromApprovalRule($oApprovalRule, 2);
@@ -448,6 +475,7 @@
 		))
 		{
 			$bStepAdded = true;
+			$oScheme->SetStepFlag(count($oScheme->GetSteps()) - 1, 'single_answer_per_person', $aStep2Data['single_answer_per_person']);
 		}
 
 		if ($bStepAdded)
@@ -469,7 +497,7 @@
 	/**
    * @param \ApprovalScheme $oScheme
    * @param int $iLevel
-   * @return array{rule: string, timeout: int, default_approval: boolean, exit_condition: string, substitute_query: string, substitute_timeout: int}
+   * @return array{rule: string, timeout: int, default_approval: boolean, exit_condition: string, substitute_query: string, substitute_timeout: int, single_answer_per_person: boolean}
    */
 	public static function GetStepDataFromApprovalRule($oApprovalRule, $iLevel)
 	{
@@ -480,6 +508,7 @@
 	      'exit_condition' => $oApprovalRule->Get("level{$iLevel}_exit_condition"),
 	      'substitute_query' => $oApprovalRule->Get("level{$iLevel}_substitute_query"),
 	      'substitute_timeout' => $oApprovalRule->Get("level{$iLevel}_substitute_timeout"),
+	      'single_answer_per_person' => ($oApprovalRule->Get("level{$iLevel}_single_answer_per_person") == 'yes'),
     ];
 	}]]></code>
         </method>
@@ -604,6 +633,372 @@
 			}
 		}
 		return false;
+	}]]></code>
+        </method>
+        <method id="SetStepFlag">
+          <comment>/**&#13;
+            * Helper - AddStepFromQuery has no parameter for extension-specific per-step flags,&#13;
+            * so once a step has been added, stamp it directly into the serialised 'steps' data.&#13;
+            */</comment>
+          <static>false</static>
+          <access>protected</access>
+          <type>Overload-DBObject</type>
+          <code><![CDATA[	protected function SetStepFlag($iStepIndex, $sKey, $mValue)
+	{
+		$aSteps = $this->GetSteps();
+		if (array_key_exists($iStepIndex, $aSteps))
+		{
+			$aSteps[$iStepIndex][$sKey] = $mValue;
+			$this->SetSteps($aSteps);
+		}
+	}]]></code>
+        </method>
+        <method id="IsSingleAnswerStep">
+          <comment>/**&#13;
+            * @param array $aStepData A step, as found in GetSteps()&#13;
+            * @return bool True if this step accepts at most one answer per person&#13;
+            */</comment>
+          <static>false</static>
+          <access>protected</access>
+          <type>Overload-DBObject</type>
+          <code><![CDATA[	protected function IsSingleAnswerStep($aStepData)
+	{
+		// Steps serialized before this option existed simply lack the key: treat them as 'no'
+		return !empty($aStepData['single_answer_per_person']);
+	}]]></code>
+        </method>
+        <method id="GetOngoingStepData">
+          <comment>/**&#13;
+            * Helper mirroring the guard upstream applies before reading the current step&#13;
+            * (@see ApprovalScheme::OnAnswer, ApprovalScheme::FindApprover, ApprovalScheme::GetContactPassCode)&#13;
+            * @return array|null The current step's data, or null if there is none to answer against&#13;
+            */</comment>
+          <static>false</static>
+          <access>protected</access>
+          <type>Overload-DBObject</type>
+          <code><![CDATA[	protected function GetOngoingStepData()
+	{
+		if ($this->Get('status') != 'ongoing')
+		{
+			return null;
+		}
+		$aSteps = $this->GetSteps();
+		$iCurrentStep = $this->Get('current_step');
+		if (!array_key_exists($iCurrentStep, $aSteps))
+		{
+			return null;
+		}
+		return $aSteps[$iCurrentStep];
+	}]]></code>
+        </method>
+        <method id="GetStepAnsweringPerson">
+          <comment>/**&#13;
+            * @param array $aApproverData One 'approvers' entry of a step&#13;
+            * @return array{0: string, 1: int}|null [class, id] of whoever actually answered this&#13;
+            * record (a substitute, via 'replier_index', or the main approver), or null if unanswered&#13;
+            */</comment>
+          <static>false</static>
+          <access>protected</access>
+          <type>Overload-DBObject</type>
+          <code><![CDATA[	protected function GetStepAnsweringPerson($aApproverData)
+	{
+		if (!array_key_exists('approval', $aApproverData))
+		{
+			return null;
+		}
+		if (array_key_exists('replier_index', $aApproverData) && array_key_exists('forward', $aApproverData))
+		{
+			$aReplierData = $aApproverData['forward'][$aApproverData['replier_index']];
+			return array($aReplierData['class'], $aReplierData['id']);
+		}
+		return array($aApproverData['class'], $aApproverData['id']);
+	}]]></code>
+        </method>
+        <method id="HasPersonAnsweredInStep">
+          <comment>/**&#13;
+            * @param array $aStepData A step, as found in GetSteps()&#13;
+            * @param string $sClass&#13;
+            * @param int $iId&#13;
+            * @return bool True if this person's answer (own capacity or substitute capacity)&#13;
+            * is already recorded somewhere in this step&#13;
+            */</comment>
+          <static>false</static>
+          <access>protected</access>
+          <type>Overload-DBObject</type>
+          <code><![CDATA[	protected function HasPersonAnsweredInStep($aStepData, $sClass, $iId)
+	{
+		foreach ($aStepData['approvers'] as $aApproverData)
+		{
+			$aReplierData = $this->GetStepAnsweringPerson($aApproverData);
+			if (!is_null($aReplierData) && ($aReplierData[0] == $sClass) && ($aReplierData[1] == $iId))
+			{
+				return true;
+			}
+		}
+		return false;
+	}]]></code>
+        </method>
+        <method id="HasOwnRecordInStep">
+          <comment>/**&#13;
+            * @param array $aStepData A step, as found in GetSteps()&#13;
+            * @param string $sClass&#13;
+            * @param int $iId&#13;
+            * @return bool True if this person holds a main approver record in this step&#13;
+            */</comment>
+          <static>false</static>
+          <access>protected</access>
+          <type>Overload-DBObject</type>
+          <code><![CDATA[	protected function HasOwnRecordInStep($aStepData, $sClass, $iId)
+	{
+		foreach ($aStepData['approvers'] as $aApproverData)
+		{
+			if (($aApproverData['class'] == $sClass) && ($aApproverData['id'] == $iId))
+			{
+				return true;
+			}
+		}
+		return false;
+	}]]></code>
+        </method>
+        <method id="IsAnswerRefused">
+          <comment>/**&#13;
+            * Shared decision for the 'single answer per person' option:&#13;
+            * - a substitute capacity is refused outright when the person also holds an own record&#13;
+            *   (their own slot always wins, whichever link they open first);&#13;
+            * - otherwise, refused as soon as this person already has an answer recorded anywhere&#13;
+            *   in the step (first answer wins).&#13;
+            * @param array $aStepData A step, as found in GetSteps()&#13;
+            * @param string $sClass&#13;
+            * @param int $iId&#13;
+            * @param bool $bAsSubstitute True if the person is answering in a substitute capacity&#13;
+            * @return bool&#13;
+            */</comment>
+          <static>false</static>
+          <access>protected</access>
+          <type>Overload-DBObject</type>
+          <code><![CDATA[	protected function IsAnswerRefused($aStepData, $sClass, $iId, $bAsSubstitute)
+	{
+		if ($bAsSubstitute && $this->HasOwnRecordInStep($aStepData, $sClass, $iId))
+		{
+			return true;
+		}
+		return $this->HasPersonAnsweredInStep($aStepData, $sClass, $iId);
+	}]]></code>
+        </method>
+        <method id="OnAnswer">
+          <static>false</static>
+          <access>public</access>
+          <type>Overload-DBObject</type>
+          <code><![CDATA[	public function OnAnswer($iStep, $oApprover, $bApprove, $oSubstitute = null, $sComment = '')
+	{
+		// Upstream ignores $iStep entirely and always writes to 'current_step': read the same step here
+		$aStepData = $this->GetOngoingStepData();
+		if (is_null($aStepData) || !$this->IsSingleAnswerStep($aStepData))
+		{
+			parent::OnAnswer($iStep, $oApprover, $bApprove, $oSubstitute, $sComment);
+			return;
+		}
+
+		$bAsSubstitute = !is_null($oSubstitute);
+		$oPerson = $bAsSubstitute ? $oSubstitute : $oApprover;
+
+		if ($this->IsAnswerRefused($aStepData, get_class($oPerson), $oPerson->GetKey(), $bAsSubstitute))
+		{
+			IssueLog::Debug(sprintf(
+				'ExtendedApprovalScheme::OnAnswer - %s::%d already has an answer recorded for this level, refusing the %s answer',
+				get_class($oPerson), $oPerson->GetKey(), $bAsSubstitute ? 'substitute' : 'approver'
+			), 'combodo-approval-extended');
+			return;
+		}
+
+		parent::OnAnswer($iStep, $oApprover, $bApprove, $oSubstitute, $sComment);
+	}]]></code>
+        </method>
+        <method id="DisplayApprovalForm">
+          <static>false</static>
+          <access>public</access>
+          <type>Overload-DBObject</type>
+          <code><![CDATA[	public function DisplayApprovalForm($sFrom, $oPage, $oApprover, $oObject, $sToken, $oSubstitute = null)
+	{
+		$aStepData = $this->GetOngoingStepData();
+		if (!is_null($aStepData) && $this->IsSingleAnswerStep($aStepData))
+		{
+			$bAsSubstitute = !is_null($oSubstitute);
+			$oPerson = $bAsSubstitute ? $oSubstitute : $oApprover;
+			if ($this->IsAnswerRefused($aStepData, get_class($oPerson), $oPerson->GetKey(), $bAsSubstitute))
+			{
+				$oPage->p(Dict::S('Approbation:AlreadyAnsweredOnThisLevel'));
+				return;
+			}
+		}
+
+		parent::DisplayApprovalForm($sFrom, $oPage, $oApprover, $oObject, $sToken, $oSubstitute);
+	}]]></code>
+        </method>
+        <method id="FindApprover">
+          <comment>/**&#13;
+            * Own slot wins: if the replier holds their own approver record in the current step,&#13;
+            * always route them there, even if the step lists a colleague's record before theirs&#13;
+            * (which is what the Portal's ApprovalBrickController::Approve()/Reject() relies on).&#13;
+            */</comment>
+          <static>false</static>
+          <access>public</access>
+          <type>Overload-DBObject</type>
+          <code><![CDATA[	public function FindApprover($oReplier)
+	{
+		$aStepData = $this->GetOngoingStepData();
+		if (!is_null($aStepData) && $this->IsSingleAnswerStep($aStepData)
+			&& $this->HasOwnRecordInStep($aStepData, get_class($oReplier), $oReplier->GetKey()))
+		{
+			return $oReplier;
+		}
+
+		return parent::FindApprover($oReplier);
+	}]]></code>
+        </method>
+        <method id="IsActiveApprover">
+          <comment>/**&#13;
+            * Once this person's single answer for the step has been recorded, stop offering them&#13;
+            * the action in the Portal (ListOngoingApprovals) and in the "Ongoing approval" report.&#13;
+            */</comment>
+          <static>false</static>
+          <access>public</access>
+          <type>Overload-DBObject</type>
+          <code><![CDATA[	public function IsActiveApprover($sContactClass, $iContactId)
+	{
+		$aStepData = $this->GetOngoingStepData();
+		if (!is_null($aStepData) && $this->IsSingleAnswerStep($aStepData)
+			&& $this->HasPersonAnsweredInStep($aStepData, $sContactClass, $iContactId))
+		{
+			return false;
+		}
+
+		return parent::IsActiveApprover($sContactClass, $iContactId);
+	}]]></code>
+        </method>
+        <method id="GetAwaitedReplies">
+          <static>false</static>
+          <access>public</access>
+          <type>Overload-DBObject</type>
+          <code><![CDATA[	public function GetAwaitedReplies()
+	{
+		$aRecipients = parent::GetAwaitedReplies();
+
+		$aStepData = $this->GetOngoingStepData();
+		if (is_null($aStepData) || !$this->IsSingleAnswerStep($aStepData))
+		{
+			return $aRecipients;
+		}
+
+		$aFiltered = array();
+		foreach ($aRecipients as $aRecipient)
+		{
+			if (array_key_exists('substitute_to', $aRecipient)
+				&& $this->IsAnswerRefused($aStepData, $aRecipient['class'], $aRecipient['id'], true))
+			{
+				// This substitute capacity would be refused by OnAnswer(): do not remind them of it
+				continue;
+			}
+			$aFiltered[] = $aRecipient;
+		}
+		return $aFiltered;
+	}]]></code>
+        </method>
+        <method id="SuppressSingleAnswerForwards">
+          <comment>/**&#13;
+            * Pre-marks, as if already notified, the substitute forwards that OnTimeout() must not&#13;
+            * mail out: a substitute who also holds their own record in the step (case 2), who has&#13;
+            * already answered (case 3, late), or who already has another live forward pending in&#13;
+            * this same step (case 3 - at most one live substitute token per person per step). Marking&#13;
+            * 'sent_time' rather than leaving the forward pending keeps ComputeTimeout() from ever&#13;
+            * spinning on a deadline nobody will act on.&#13;
+            */</comment>
+          <static>false</static>
+          <access>protected</access>
+          <type>Overload-DBObject</type>
+          <code><![CDATA[	protected function SuppressSingleAnswerForwards()
+	{
+		$aSteps = $this->GetSteps();
+		$iCurrentStep = $this->Get('current_step');
+		if (!array_key_exists($iCurrentStep, $aSteps))
+		{
+			return;
+		}
+		$aStepData = &$aSteps[$iCurrentStep];
+
+		$iStepStarted = $this->ComputeLastStart();
+		$iTimeoutSec = $aStepData['timeout_sec'];
+		$iNow = $this->Now();
+
+		// Persons who already hold a live (non-suppressed) forward notification in this step,
+		// sent in this call or an earlier one.
+		$aNotifiedPersons = array();
+		foreach ($aStepData['approvers'] as $aApproverData)
+		{
+			if (!array_key_exists('forward', $aApproverData)) continue;
+			foreach ($aApproverData['forward'] as $aForwardData)
+			{
+				if (array_key_exists('sent_time', $aForwardData) && empty($aForwardData['single_answer_suppressed']))
+				{
+					$aNotifiedPersons[$aForwardData['class'].'::'.$aForwardData['id']] = true;
+				}
+			}
+		}
+
+		$bChanged = false;
+		foreach ($aStepData['approvers'] as &$aApproverData)
+		{
+			// Skip this approver if the answer has been given (mirrors ApprovalScheme::OnTimeout)
+			if (array_key_exists('approval', $aApproverData)) continue;
+			if (!array_key_exists('forward', $aApproverData)) continue;
+
+			foreach ($aApproverData['forward'] as &$aForwardData)
+			{
+				// Skip this forward if already notified
+				if (array_key_exists('sent_time', $aForwardData)) continue;
+				// Skip this forward if it is not due yet
+				if ($iNow < $this->ComputeDeadline($iStepStarted, $iTimeoutSec * $aForwardData['timeout_percent'] / 100)) continue;
+
+				$sPersonKey = $aForwardData['class'].'::'.$aForwardData['id'];
+				$bMustSuppress = $this->HasOwnRecordInStep($aStepData, $aForwardData['class'], $aForwardData['id'])
+					|| $this->HasPersonAnsweredInStep($aStepData, $aForwardData['class'], $aForwardData['id'])
+					|| array_key_exists($sPersonKey, $aNotifiedPersons);
+
+				if ($bMustSuppress)
+				{
+					$aForwardData['sent_time'] = $iNow;
+					$aForwardData['single_answer_suppressed'] = true;
+					$bChanged = true;
+				}
+				else
+				{
+					// Reserve this person's one live slot in the step for this forward
+					$aNotifiedPersons[$sPersonKey] = true;
+				}
+			}
+			unset($aForwardData);
+		}
+		unset($aApproverData);
+
+		if ($bChanged)
+		{
+			$this->SetSteps($aSteps);
+		}
+	}]]></code>
+        </method>
+        <method id="OnTimeout">
+          <static>false</static>
+          <access>public</access>
+          <type>Overload-DBObject</type>
+          <code><![CDATA[	public function OnTimeout()
+	{
+		$aStepData = $this->GetOngoingStepData();
+		if (!is_null($aStepData) && $this->IsSingleAnswerStep($aStepData) && ($aStepData['status'] == 'ongoing'))
+		{
+			$this->SuppressSingleAnswerForwards();
+		}
+
+		parent::OnTimeout();
 	}]]></code>
         </method>
       </methods>
