@@ -15,6 +15,7 @@
  *
  */
 Dict::Add('DE DE', 'German', 'Deutsch', [
+	'Approbation:AlreadyAnsweredOnThisLevel' => 'Sie haben auf diesem Freigabe-Level bereits geantwortet',
 	'Approbation:ApprovalRequested' => 'Ihre Freigabeanfrage wurde erstellt',
 	'Approbation:FormBody' => '<p>Sehr geehrte/r $approver->html(friendlyname)$, bitte nehmen sie sich etwas Zeit, um das Ticket zu bearbeiten</p>',
 	'Approbation:Introduction' => '<p>Sehr geehrte/r $approver->html(friendlyname)$, bitte nehmen sie sich etwas Zeit, um $object->html(friendlyname)$ Ticket zu bearbeiten</p>',
@@ -54,6 +55,12 @@ Dict::Add('DE DE', 'German', 'Deutsch', [
 	'Class:ApprovalRule/Attribute:level1_exit_condition/Value:first_reply+' => 'Die erste Rückmeldung bestimmt über die Freigabe in Level 1',
 	'Class:ApprovalRule/Attribute:level1_rule' => 'Freigabe Level 1',
 	'Class:ApprovalRule/Attribute:level1_rule+' => 'OQL-Abfrage um die Genehmiger für das Ticket zu ermitteln, wobei Platzhalter wie `:this->caller_id` verwendet werden können.',
+	'Class:ApprovalRule/Attribute:level1_single_answer_per_person' => 'Nur eine Antwort pro Person (Level 1)',
+	'Class:ApprovalRule/Attribute:level1_single_answer_per_person+' => 'Eine Person, die auf diesem Level mehrere Genehmiger- oder Vertreterrollen innehat, kann nur einmal antworten; ihre eigene Rolle als Genehmiger hat dabei Vorrang',
+	'Class:ApprovalRule/Attribute:level1_single_answer_per_person/Value:no' => 'nein',
+	'Class:ApprovalRule/Attribute:level1_single_answer_per_person/Value:no+' => 'nein',
+	'Class:ApprovalRule/Attribute:level1_single_answer_per_person/Value:yes' => 'ja',
+	'Class:ApprovalRule/Attribute:level1_single_answer_per_person/Value:yes+' => 'ja',
 	'Class:ApprovalRule/Attribute:level1_substitute_query' => 'Vertreter L1',
 	'Class:ApprovalRule/Attribute:level1_substitute_query+' => 'Stellvertreter sind vom Genehmiger abhängig: Über den Platzhalter „:approver->...“ in der OQL-Abfrage, können Stellvertreter ermittelt werden.',
 	'Class:ApprovalRule/Attribute:level1_substitute_timeout' => 'Verzögerung der Vertreter-Benachrichtigung (L1)',
@@ -76,6 +83,12 @@ Dict::Add('DE DE', 'German', 'Deutsch', [
 	'Class:ApprovalRule/Attribute:level2_exit_condition/Value:first_reply+' => 'Die erste Rückmeldung bestimmt über die Freigabe in Level 2',
 	'Class:ApprovalRule/Attribute:level2_rule' => 'Freigabe Level 2',
 	'Class:ApprovalRule/Attribute:level2_rule+' => 'OQL-Abfrage, die die für das Ticket passenden Genehmiger ermittelt; Platzhalter wie `:this->caller_id` sind möglich',
+	'Class:ApprovalRule/Attribute:level2_single_answer_per_person' => 'Nur eine Antwort pro Person (Level 2)',
+	'Class:ApprovalRule/Attribute:level2_single_answer_per_person+' => 'Eine Person, die auf diesem Level mehrere Genehmiger- oder Vertreterrollen innehat, kann nur einmal antworten; ihre eigene Rolle als Genehmiger hat dabei Vorrang',
+	'Class:ApprovalRule/Attribute:level2_single_answer_per_person/Value:no' => 'nein',
+	'Class:ApprovalRule/Attribute:level2_single_answer_per_person/Value:no+' => 'nein',
+	'Class:ApprovalRule/Attribute:level2_single_answer_per_person/Value:yes' => 'ja',
+	'Class:ApprovalRule/Attribute:level2_single_answer_per_person/Value:yes+' => 'ja',
 	'Class:ApprovalRule/Attribute:level2_substitute_query' => 'Vertreter L2',
 	'Class:ApprovalRule/Attribute:level2_substitute_query+' => 'Stellvertreter sind vom Genehmiger abhängig: Über den Platzhalter „:approver->...“ in der OQL-Abfrage, können Stellvertreter ermittelt werden.',
 	'Class:ApprovalRule/Attribute:level2_substitute_timeout' => 'Verzögerung der Vertreter-Benachrichtigung (L2)',

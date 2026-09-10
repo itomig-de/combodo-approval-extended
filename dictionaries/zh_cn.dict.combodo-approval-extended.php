@@ -10,6 +10,7 @@
  *
  */
 Dict::Add('ZH CN', 'Chinese', '简体中文', [
+	'Approbation:AlreadyAnsweredOnThisLevel' => 'You have already answered on this approval level~~',
 	'Approbation:ApprovalRequested' => '需要您的审批',
 	'Approbation:FormBody' => '<p>尊敬的$approver->html(friendlyname)$, 请您抽空批复工单</p>',
 	'Approbation:Introduction' => '<p>尊敬的$approver->html(friendlyname)$, 请您抽空批复工单$object->html(friendlyname)$</p>',
@@ -49,6 +50,12 @@ Dict::Add('ZH CN', 'Chinese', '简体中文', [
 	'Class:ApprovalRule/Attribute:level1_exit_condition/Value:first_reply+' => '首个批复决定了一级审批的批复结果',
 	'Class:ApprovalRule/Attribute:level1_rule' => '一级审批',
 	'Class:ApprovalRule/Attribute:level1_rule+' => 'OQL to retrieve the Approvers appropriate for the Ticket, using placeholder like `:this->caller_id`~~',
+	'Class:ApprovalRule/Attribute:level1_single_answer_per_person' => 'One answer per person L1~~',
+	'Class:ApprovalRule/Attribute:level1_single_answer_per_person+' => 'A person holding several approver or substitute slots at this level can cast only one answer; their own slot takes precedence~~',
+	'Class:ApprovalRule/Attribute:level1_single_answer_per_person/Value:no' => 'no~~',
+	'Class:ApprovalRule/Attribute:level1_single_answer_per_person/Value:no+' => '',
+	'Class:ApprovalRule/Attribute:level1_single_answer_per_person/Value:yes' => 'yes~~',
+	'Class:ApprovalRule/Attribute:level1_single_answer_per_person/Value:yes+' => '',
 	'Class:ApprovalRule/Attribute:level1_substitute_query' => '一级审批代理人',
 	'Class:ApprovalRule/Attribute:level1_substitute_query+' => '代理人依赖于审批人: 在查询中使用占位符 `:approver->...` 以获取相应的代理人',
 	'Class:ApprovalRule/Attribute:level1_substitute_timeout' => '一级代理人通知时限',
@@ -71,6 +78,12 @@ Dict::Add('ZH CN', 'Chinese', '简体中文', [
 	'Class:ApprovalRule/Attribute:level2_exit_condition/Value:first_reply+' => '首个批复决定了二级审批的审批结果',
 	'Class:ApprovalRule/Attribute:level2_rule' => '二级审批',
 	'Class:ApprovalRule/Attribute:level2_rule+' => 'OQL to retrieve the Approvers appropriate for the Ticket, using placeholder like `:this->caller_id`~~',
+	'Class:ApprovalRule/Attribute:level2_single_answer_per_person' => 'One answer per person L2~~',
+	'Class:ApprovalRule/Attribute:level2_single_answer_per_person+' => 'A person holding several approver or substitute slots at this level can cast only one answer; their own slot takes precedence~~',
+	'Class:ApprovalRule/Attribute:level2_single_answer_per_person/Value:no' => 'no~~',
+	'Class:ApprovalRule/Attribute:level2_single_answer_per_person/Value:no+' => '',
+	'Class:ApprovalRule/Attribute:level2_single_answer_per_person/Value:yes' => 'yes~~',
+	'Class:ApprovalRule/Attribute:level2_single_answer_per_person/Value:yes+' => '',
 	'Class:ApprovalRule/Attribute:level2_substitute_query' => '二级审批代理人',
 	'Class:ApprovalRule/Attribute:level2_substitute_query+' => '代理人依赖于审批人: 在查询中使用占位符 `:approver->...` 以获取相应的代理人',
 	'Class:ApprovalRule/Attribute:level2_substitute_timeout' => '二级代理人通知时限',
