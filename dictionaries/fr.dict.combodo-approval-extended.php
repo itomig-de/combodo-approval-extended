@@ -13,6 +13,7 @@
  *
  */
 Dict::Add('FR FR', 'French', 'Français', [
+	'Approbation:AlreadyAnsweredOnThisLevel' => 'Vous avez déjà répondu à ce niveau d\'approbation',
 	'Approbation:ApprovalRequested' => 'Votre approbation est attendue',
 	'Approbation:FormBody' => '<p>Cher $approver->html(friendlyname)$, merci de prendre le temps d\'approuver le ticket</p>',
 	'Approbation:Introduction' => '<p>Cher $approver->html(friendlyname)$, merci de prendre le temps d\'approuver le ticket $object->html(friendlyname)$</p>',
@@ -52,6 +53,12 @@ Dict::Add('FR FR', 'French', 'Français', [
 	'Class:ApprovalRule/Attribute:level1_exit_condition/Value:first_reply+' => 'La première réponse détermine le résultat du niveau 1',
 	'Class:ApprovalRule/Attribute:level1_rule' => 'Approbateurs N1',
 	'Class:ApprovalRule/Attribute:level1_rule+' => 'OQL pour filtrer les approbateurs à utiliser pour le Ticket, avec des placeholders comme `:this->caller_id`',
+	'Class:ApprovalRule/Attribute:level1_single_answer_per_person' => 'Une seule réponse par personne N1',
+	'Class:ApprovalRule/Attribute:level1_single_answer_per_person+' => 'Une personne cumulant plusieurs rôles d\'approbateur ou de suppléant à ce niveau ne peut répondre qu\'une seule fois ; son propre rôle d\'approbateur est toujours prioritaire',
+	'Class:ApprovalRule/Attribute:level1_single_answer_per_person/Value:no' => 'non',
+	'Class:ApprovalRule/Attribute:level1_single_answer_per_person/Value:no+' => '',
+	'Class:ApprovalRule/Attribute:level1_single_answer_per_person/Value:yes' => 'oui',
+	'Class:ApprovalRule/Attribute:level1_single_answer_per_person/Value:yes+' => '',
 	'Class:ApprovalRule/Attribute:level1_substitute_query' => 'Suppléants N1',
 	'Class:ApprovalRule/Attribute:level1_substitute_query+' => 'Les suppléants sont liés à un approbateur : la requête devrait contenir un placeholder `:approver->...` pour lier le suppléant à l\'approbateur',
 	'Class:ApprovalRule/Attribute:level1_substitute_timeout' => 'Notification des suppléants N1',
@@ -74,6 +81,12 @@ Dict::Add('FR FR', 'French', 'Français', [
 	'Class:ApprovalRule/Attribute:level2_exit_condition/Value:first_reply+' => 'La première réponse détermine le résultat du niveau 2',
 	'Class:ApprovalRule/Attribute:level2_rule' => 'Approbateurs N2',
 	'Class:ApprovalRule/Attribute:level2_rule+' => 'OQL pour filtrer les approbateurs à utiliser pour le Ticket, avec des placeholders comme `:this->caller_id`',
+	'Class:ApprovalRule/Attribute:level2_single_answer_per_person' => 'Une seule réponse par personne N2',
+	'Class:ApprovalRule/Attribute:level2_single_answer_per_person+' => 'Une personne cumulant plusieurs rôles d\'approbateur ou de suppléant à ce niveau ne peut répondre qu\'une seule fois ; son propre rôle d\'approbateur est toujours prioritaire',
+	'Class:ApprovalRule/Attribute:level2_single_answer_per_person/Value:no' => 'non',
+	'Class:ApprovalRule/Attribute:level2_single_answer_per_person/Value:no+' => '',
+	'Class:ApprovalRule/Attribute:level2_single_answer_per_person/Value:yes' => 'oui',
+	'Class:ApprovalRule/Attribute:level2_single_answer_per_person/Value:yes+' => '',
 	'Class:ApprovalRule/Attribute:level2_substitute_query' => 'Suppléants N2',
 	'Class:ApprovalRule/Attribute:level2_substitute_query+' => 'Les suppléants sont liés à un approbateur : la requête devrait contenir un placeholder `:approver->...` pour lier le suppléant à l\'approbateur',
 	'Class:ApprovalRule/Attribute:level2_substitute_timeout' => 'Notification des suppléants N2',

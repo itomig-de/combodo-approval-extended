@@ -37,6 +37,7 @@ Dict::Add('EN GB', 'British English', 'British English', array(
 	'Approbation:FormBody' => '<p>Dear $approver->html(friendlyname)$, please take some time to approve or reject the ticket</p>',
 	'Approbation:ApprovalRequested' => 'Your approval is requested',
 	'Approbation:Introduction' => '<p>Dear $approver->html(friendlyname)$, please take some time to approve or reject ticket $object->html(friendlyname)$</p>',
+	'Approbation:AlreadyAnsweredOnThisLevel' => 'You have already answered on this approval level',
 
 
 ));
@@ -60,6 +61,12 @@ Dict::Add('EN GB', 'British English', 'British English', array(
 	'Class:ApprovalRule/Attribute:level1_default_approval/Value:no+' => '',
 	'Class:ApprovalRule/Attribute:level1_default_approval/Value:yes' => 'yes',
 	'Class:ApprovalRule/Attribute:level1_default_approval/Value:yes+' => '',
+	'Class:ApprovalRule/Attribute:level1_single_answer_per_person' => 'One answer per person L1',
+	'Class:ApprovalRule/Attribute:level1_single_answer_per_person+' => 'A person holding several approver or substitute slots at this level can cast only one answer; their own slot takes precedence',
+	'Class:ApprovalRule/Attribute:level1_single_answer_per_person/Value:no' => 'no',
+	'Class:ApprovalRule/Attribute:level1_single_answer_per_person/Value:no+' => '',
+	'Class:ApprovalRule/Attribute:level1_single_answer_per_person/Value:yes' => 'yes',
+	'Class:ApprovalRule/Attribute:level1_single_answer_per_person/Value:yes+' => '',
 	'Class:ApprovalRule/Attribute:level1_timeout' => 'Approval delay L1',
 	'Class:ApprovalRule/Attribute:level1_timeout+' => 'Expressed in hours',
 	'Class:ApprovalRule/Attribute:level1_exit_condition' => 'Approval ending L1',
@@ -82,6 +89,12 @@ Dict::Add('EN GB', 'British English', 'British English', array(
 	'Class:ApprovalRule/Attribute:level2_default_approval/Value:no+' => '',
 	'Class:ApprovalRule/Attribute:level2_default_approval/Value:yes' => 'yes',
 	'Class:ApprovalRule/Attribute:level2_default_approval/Value:yes+' => '',
+	'Class:ApprovalRule/Attribute:level2_single_answer_per_person' => 'One answer per person L2',
+	'Class:ApprovalRule/Attribute:level2_single_answer_per_person+' => 'A person holding several approver or substitute slots at this level can cast only one answer; their own slot takes precedence',
+	'Class:ApprovalRule/Attribute:level2_single_answer_per_person/Value:no' => 'no',
+	'Class:ApprovalRule/Attribute:level2_single_answer_per_person/Value:no+' => '',
+	'Class:ApprovalRule/Attribute:level2_single_answer_per_person/Value:yes' => 'yes',
+	'Class:ApprovalRule/Attribute:level2_single_answer_per_person/Value:yes+' => '',
 	'Class:ApprovalRule/Attribute:level2_timeout' => 'Approval delay L2',
 	'Class:ApprovalRule/Attribute:level2_timeout+' => 'Expressed in hours',
 	'Class:ApprovalRule/Attribute:level2_exit_condition' => 'Approval ending L2',

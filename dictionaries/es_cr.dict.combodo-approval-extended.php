@@ -11,6 +11,7 @@
  *
  */
 Dict::Add('ES CR', 'Spanish', 'Español, Castellano', [
+	'Approbation:AlreadyAnsweredOnThisLevel' => 'You have already answered on this approval level~~',
 	'Approbation:ApprovalRequested' => 'Su aprobación es requerida',
 	'Approbation:FormBody' => '<p>Estimado(a) $approver->html(friendlyname)$, por favor tome un tiempo para aprobar o rechazar el ticket</p>',
 	'Approbation:Introduction' => '<p>Estimado(a) $approver->html(friendlyname)$, por favor tome un tiempo para aprobar o rechazar el ticket $object->html(friendlyname)$</p>',
@@ -50,6 +51,12 @@ Dict::Add('ES CR', 'Spanish', 'Español, Castellano', [
 	'Class:ApprovalRule/Attribute:level1_exit_condition/Value:first_reply+' => 'La primer respuesta determina el resultado en Nivel 1',
 	'Class:ApprovalRule/Attribute:level1_rule' => 'Aprobación Nivel 1',
 	'Class:ApprovalRule/Attribute:level1_rule+' => '',
+	'Class:ApprovalRule/Attribute:level1_single_answer_per_person' => 'One answer per person L1~~',
+	'Class:ApprovalRule/Attribute:level1_single_answer_per_person+' => 'A person holding several approver or substitute slots at this level can cast only one answer; their own slot takes precedence~~',
+	'Class:ApprovalRule/Attribute:level1_single_answer_per_person/Value:no' => 'no~~',
+	'Class:ApprovalRule/Attribute:level1_single_answer_per_person/Value:no+' => '',
+	'Class:ApprovalRule/Attribute:level1_single_answer_per_person/Value:yes' => 'yes~~',
+	'Class:ApprovalRule/Attribute:level1_single_answer_per_person/Value:yes+' => '',
 	'Class:ApprovalRule/Attribute:level1_substitute_query' => 'Substitute L1~~',
 	'Class:ApprovalRule/Attribute:level1_substitute_query+' => 'Substitutes are approver dependent : use `:approver->...` placeholder in the query to retrieve the corresponding substitutes~~',
 	'Class:ApprovalRule/Attribute:level1_substitute_timeout' => 'Substitute notification delay L1~~',
@@ -72,6 +79,12 @@ Dict::Add('ES CR', 'Spanish', 'Español, Castellano', [
 	'Class:ApprovalRule/Attribute:level2_exit_condition/Value:first_reply+' => 'La primer respuesta determina el resultado en Nivel 2',
 	'Class:ApprovalRule/Attribute:level2_rule' => 'Aprobación Nivel 2',
 	'Class:ApprovalRule/Attribute:level2_rule+' => '',
+	'Class:ApprovalRule/Attribute:level2_single_answer_per_person' => 'One answer per person L2~~',
+	'Class:ApprovalRule/Attribute:level2_single_answer_per_person+' => 'A person holding several approver or substitute slots at this level can cast only one answer; their own slot takes precedence~~',
+	'Class:ApprovalRule/Attribute:level2_single_answer_per_person/Value:no' => 'no~~',
+	'Class:ApprovalRule/Attribute:level2_single_answer_per_person/Value:no+' => '',
+	'Class:ApprovalRule/Attribute:level2_single_answer_per_person/Value:yes' => 'yes~~',
+	'Class:ApprovalRule/Attribute:level2_single_answer_per_person/Value:yes+' => '',
 	'Class:ApprovalRule/Attribute:level2_substitute_query' => 'Substitute L2~~',
 	'Class:ApprovalRule/Attribute:level2_substitute_query+' => 'Substitutes are approver dependent : use `:approver->...` placeholder in the query to retrieve the corresponding substitutes~~',
 	'Class:ApprovalRule/Attribute:level2_substitute_timeout' => 'Substitute notification delay L2~~',
