@@ -137,6 +137,16 @@
           <default_value>no</default_value>
           <is_null_allowed>false</is_null_allowed>
         </field>
+        <field id="level1_single_answer_per_person" xsi:type="AttributeEnum">
+          <values>
+            <value id="yes"><code>yes</code></value>
+            <value id="no"><code>no</code></value>
+          </values>
+          <display_style>radio_horizontal</display_style>
+          <sql>level1_single_answer_per_person</sql>
+          <default_value>no</default_value>
+          <is_null_allowed>false</is_null_allowed>
+        </field>
         <field id="level1_timeout" xsi:type="AttributeInteger">
           <sql>level1_timeout</sql>
           <default_value>70</default_value>
@@ -174,6 +184,16 @@
           </values>
           <display_style>radio_horizontal</display_style>
           <sql>level2_default_approval</sql>
+          <default_value>no</default_value>
+          <is_null_allowed>true</is_null_allowed>
+        </field>
+        <field id="level2_single_answer_per_person" xsi:type="AttributeEnum">
+          <values>
+            <value id="yes"><code>yes</code></value>
+            <value id="no"><code>no</code></value>
+          </values>
+          <display_style>radio_horizontal</display_style>
+          <sql>level2_single_answer_per_person</sql>
           <default_value>no</default_value>
           <is_null_allowed>true</is_null_allowed>
         </field>
@@ -274,6 +294,9 @@
                     <item id="level1_substitute_timeout">
                       <rank>60</rank>
                     </item>
+                    <item id="level1_single_answer_per_person">
+                      <rank>70</rank>
+                    </item>
                   </items>
                 </item>
               </items>
@@ -301,6 +324,9 @@
                     </item>
                     <item id="level2_substitute_timeout">
                       <rank>60</rank>
+                    </item>
+                    <item id="level2_single_answer_per_person">
+                      <rank>70</rank>
                     </item>
                   </items>
                 </item>
@@ -433,6 +459,10 @@
 		))
 		{
 			$bStepAdded = true;
+			if ($aStep1Data['single_answer_per_person'])
+			{
+				$oScheme->ApplySingleAnswerPerPerson(count($oScheme->GetSteps()) - 1);
+			}
 		}
 
     $aStep2Data = static::GetStepDataFromApprovalRule($oApprovalRule, 2);
@@ -448,6 +478,10 @@
 		))
 		{
 			$bStepAdded = true;
+			if ($aStep2Data['single_answer_per_person'])
+			{
+				$oScheme->ApplySingleAnswerPerPerson(count($oScheme->GetSteps()) - 1);
+			}
 		}
 
 		if ($bStepAdded)
@@ -469,7 +503,7 @@
 	/**
    * @param \ApprovalScheme $oScheme
    * @param int $iLevel
-   * @return array{rule: string, timeout: int, default_approval: boolean, exit_condition: string, substitute_query: string, substitute_timeout: int}
+   * @return array{rule: string, timeout: int, default_approval: boolean, exit_condition: string, substitute_query: string, substitute_timeout: int, single_answer_per_person: boolean}
    */
 	public static function GetStepDataFromApprovalRule($oApprovalRule, $iLevel)
 	{
@@ -480,6 +514,7 @@
 	      'exit_condition' => $oApprovalRule->Get("level{$iLevel}_exit_condition"),
 	      'substitute_query' => $oApprovalRule->Get("level{$iLevel}_substitute_query"),
 	      'substitute_timeout' => $oApprovalRule->Get("level{$iLevel}_substitute_timeout"),
+	      'single_answer_per_person' => ($oApprovalRule->Get("level{$iLevel}_single_answer_per_person") == 'yes'),
     ];
 	}]]></code>
         </method>
@@ -604,6 +639,99 @@
 			}
 		}
 		return false;
+	}]]></code>
+        </method>
+        <method id="ApplySingleAnswerPerPerson">
+          <comment>/**&#13;
+            * Enforces "one answer per person" on a freshly built step, at the only moment the&#13;
+            * duplicate can arise: the approver query (levelN_rule) and the substitute query&#13;
+            * (levelN_substitute_query) are independent, so nothing stops one person from ending&#13;
+            * up with several votes on the same level.&#13;
+            *&#13;
+            * Substitute (forward) entries are dropped when the same person already votes in this&#13;
+            * step - either because they hold their own approver record, or because they are&#13;
+            * already someone else's substitute. Only 'forward' lists are touched, never&#13;
+            * 'approvers': the number of votes the level requires is left untouched.&#13;
+            *&#13;
+            * Substitutes are materialised once, here, by ApprovalScheme::AddSubstitutes(), and are&#13;
+            * only ever read afterwards (OnTimeout, GetAwaitedReplies, FindApprover, OnAnswer).&#13;
+            * Removing the duplicate here therefore needs no guard at answer time: the second&#13;
+            * capacity never exists, so it is never mailed, never listed and never answerable.&#13;
+            *&#13;
+            * @param int $iStepIndex Index of the step in GetSteps()&#13;
+            * @return void&#13;
+            */</comment>
+          <static>false</static>
+          <access>protected</access>
+          <type>Overload-DBObject</type>
+          <code><![CDATA[	protected function ApplySingleAnswerPerPerson($iStepIndex)
+	{
+		$aSteps = $this->GetSteps();
+		if (!array_key_exists($iStepIndex, $aSteps))
+		{
+			return;
+		}
+		$aStepData = &$aSteps[$iStepIndex];
+
+		// Everybody who already holds a vote in this step: the main approvers up front, then the
+		// substitutes as we decide to keep them (first approver in the list wins a shared substitute)
+		$aVoters = array();
+		foreach ($aStepData['approvers'] as $aApproverData)
+		{
+			$aVoters[$aApproverData['class'].'::'.$aApproverData['id']] = true;
+		}
+
+		$aDropped = array();
+		foreach ($aStepData['approvers'] as &$aApproverData)
+		{
+			if (!array_key_exists('forward', $aApproverData))
+			{
+				continue;
+			}
+			$aKept = array();
+			foreach ($aApproverData['forward'] as $aForwardData)
+			{
+				$sVoterKey = $aForwardData['class'].'::'.$aForwardData['id'];
+				if (array_key_exists($sVoterKey, $aVoters))
+				{
+					$aDropped[] = array(
+						'class' => $aForwardData['class'],
+						'id' => $aForwardData['id'],
+						'substitute_to' => array(
+							'class' => $aApproverData['class'],
+							'id' => $aApproverData['id'],
+						),
+					);
+					continue;
+				}
+				$aVoters[$sVoterKey] = true;
+				$aKept[] = $aForwardData;
+			}
+			// Re-indexed by array_values(): 'replier_index' is only ever set once an answer comes
+			// in, which cannot have happened yet at scheme creation time
+			if (count($aKept) == 0)
+			{
+				unset($aApproverData['forward']);
+			}
+			else
+			{
+				$aApproverData['forward'] = array_values($aKept);
+			}
+		}
+		unset($aApproverData);
+
+		// Traceability only - no other code reads these two keys
+		$aStepData['single_answer_per_person'] = true;
+		if (count($aDropped) > 0)
+		{
+			$aStepData['single_answer_dropped_forwards'] = $aDropped;
+			IssueLog::Info(sprintf(
+				'ExtendedApprovalScheme: step %d - dropped %d duplicate substitute capacity(ies) to keep one answer per person',
+				$iStepIndex, count($aDropped)
+			), 'combodo-approval-extended');
+		}
+
+		$this->SetSteps($aSteps);
 	}]]></code>
         </method>
       </methods>

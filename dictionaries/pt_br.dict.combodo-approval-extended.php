@@ -13,7 +13,6 @@
  *
  */
 Dict::Add('PT BR', 'Brazilian', 'Brazilian', [
-	'Approbation:AlreadyAnsweredOnThisLevel' => 'You have already answered on this approval level~~',
 	'Approbation:ApprovalRequested' => 'Sua aprovação é solicitada',
 	'Approbation:FormBody' => '<p>Caro $approver->html(friendlyname)$, por favor, dedique algum tempo para aprovar ou rejeitar a solicitação</p>',
 	'Approbation:Introduction' => '<p>Caro $approver->html(friendlyname)$, por favor, dedique algum tempo para aprovar ou rejeitar a solicitação $object->html(friendlyname)$</p>',

@@ -37,7 +37,6 @@ Dict::Add('EN GB', 'British English', 'British English', array(
 	'Approbation:FormBody' => '<p>Dear $approver->html(friendlyname)$, please take some time to approve or reject the ticket</p>',
 	'Approbation:ApprovalRequested' => 'Your approval is requested',
 	'Approbation:Introduction' => '<p>Dear $approver->html(friendlyname)$, please take some time to approve or reject ticket $object->html(friendlyname)$</p>',
-	'Approbation:AlreadyAnsweredOnThisLevel' => 'You have already answered on this approval level',
 
 
 ));

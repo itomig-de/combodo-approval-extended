@@ -13,7 +13,6 @@
  *
  */
 Dict::Add('FR FR', 'French', 'Français', [
-	'Approbation:AlreadyAnsweredOnThisLevel' => 'Vous avez déjà répondu à ce niveau d\'approbation',
 	'Approbation:ApprovalRequested' => 'Votre approbation est attendue',
 	'Approbation:FormBody' => '<p>Cher $approver->html(friendlyname)$, merci de prendre le temps d\'approuver le ticket</p>',
 	'Approbation:Introduction' => '<p>Cher $approver->html(friendlyname)$, merci de prendre le temps d\'approuver le ticket $object->html(friendlyname)$</p>',

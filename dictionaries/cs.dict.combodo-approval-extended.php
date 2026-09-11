@@ -10,7 +10,6 @@
  *
  */
 Dict::Add('CS CZ', 'Czech', 'Čeština', [
-	'Approbation:AlreadyAnsweredOnThisLevel' => 'You have already answered on this approval level~~',
 	'Approbation:ApprovalRequested' => 'Je požadováno Vaše rozhodnutí',
 	'Approbation:FormBody' => '<p>Vážený(á) $approver->html(friendlyname)$, prosím o schválení/zamítnutí Tiketu</p>',
 	'Approbation:Introduction' => '<p>Vážený(á) $approver->html(friendlyname)$, prosím o schválení nebo zamítnutí tiketu $object->html(friendlyname)$</p>',

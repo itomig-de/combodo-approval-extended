@@ -15,7 +15,6 @@
  *
  */
 Dict::Add('DE DE', 'German', 'Deutsch', [
-	'Approbation:AlreadyAnsweredOnThisLevel' => 'Sie haben auf diesem Freigabe-Level bereits geantwortet',
 	'Approbation:ApprovalRequested' => 'Ihre Freigabeanfrage wurde erstellt',
 	'Approbation:FormBody' => '<p>Sehr geehrte/r $approver->html(friendlyname)$, bitte nehmen sie sich etwas Zeit, um das Ticket zu bearbeiten</p>',
 	'Approbation:Introduction' => '<p>Sehr geehrte/r $approver->html(friendlyname)$, bitte nehmen sie sich etwas Zeit, um $object->html(friendlyname)$ Ticket zu bearbeiten</p>',

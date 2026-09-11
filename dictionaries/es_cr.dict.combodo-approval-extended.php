@@ -11,7 +11,6 @@
  *
  */
 Dict::Add('ES CR', 'Spanish', 'Español, Castellano', [
-	'Approbation:AlreadyAnsweredOnThisLevel' => 'You have already answered on this approval level~~',
 	'Approbation:ApprovalRequested' => 'Su aprobación es requerida',
 	'Approbation:FormBody' => '<p>Estimado(a) $approver->html(friendlyname)$, por favor tome un tiempo para aprobar o rechazar el ticket</p>',
 	'Approbation:Introduction' => '<p>Estimado(a) $approver->html(friendlyname)$, por favor tome un tiempo para aprobar o rechazar el ticket $object->html(friendlyname)$</p>',

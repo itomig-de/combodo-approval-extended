@@ -10,7 +10,6 @@
  *
  */
 Dict::Add('ZH CN', 'Chinese', '简体中文', [
-	'Approbation:AlreadyAnsweredOnThisLevel' => 'You have already answered on this approval level~~',
 	'Approbation:ApprovalRequested' => '需要您的审批',
 	'Approbation:FormBody' => '<p>尊敬的$approver->html(friendlyname)$, 请您抽空批复工单</p>',
 	'Approbation:Introduction' => '<p>尊敬的$approver->html(friendlyname)$, 请您抽空批复工单$object->html(friendlyname)$</p>',
